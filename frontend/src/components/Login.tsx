@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 const Login: React.FC = () => {
+  const navigate = useNavigate();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [message, setMessage] = useState('');
@@ -12,6 +14,7 @@ const Login: React.FC = () => {
       const response = await axios.post('http://localhost:5000/login', { username, password });
       setMessage(response.data.message);
       localStorage.setItem('role', response.data.role);
+      navigate('/dashboard');
     } catch (error) {
       setMessage('Login failed');
     }
