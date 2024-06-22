@@ -13,7 +13,9 @@ const Login: React.FC = () => {
     try {
       const response = await axios.post('http://localhost:5000/login', { username, password });
       setMessage(response.data.message);
+
       localStorage.setItem('role', response.data.role);
+
       navigate('/dashboard');
     } catch (error) {
       setMessage('Login failed');

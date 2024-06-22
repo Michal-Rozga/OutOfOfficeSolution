@@ -2,6 +2,7 @@ import 'reflect-metadata';
 import express from 'express';
 import { createConnection } from 'typeorm';
 import { User } from './entity/User';
+import { Employee } from './entity/Employee';
 
 createConnection().then(async connection => {
   const app = express();
@@ -9,33 +10,66 @@ createConnection().then(async connection => {
 
   app.use(express.json());
 
+  app.get('/roles', async (req, res) => {
+    try {
+      const roles = await connection.getRepository(Employee).find({ select: ['id', 'role'] });
+      res.json(roles);
+    } catch (error) {
+      console.error('Failed to fetch roles:', error);
+      res.status(500).send('Failed to fetch roles');
+    }
+  });
+
   app.post('/register', async (req, res) => {
     const { username, password, role } = req.body;
-    const user = new User();
-    user.username = username;
-    user.password = password;
-    user.role = role;
 
-    const userRepository = connection.getRepository(User);
-    await userRepository.save(user);
+    if (!username || !password || !role) {
+      return res.status(400).send('Username, password, and role are required');
+    }
 
-    res.send('User registered successfully');
+    try {
+      let employee = await connection.getRepository(Employee).findOne({ where: { role } });
+
+      if (!employee) {
+        employee = new Employee();
+        employee.role = role;
+        await connection.getRepository(Employee).save(employee);
+      }
+
+      const user = new User();
+      user.username = username;
+      user.password = password;
+      user.employee = employee;
+
+      const userRepository = connection.getRepository(User);
+      await userRepository.save(user);
+
+      res.send('User registered successfully');
+    } catch (error) {
+      console.error('Registration failed:', error);
+      res.status(500).send('Registration failed');
+    }
   });
 
   app.post('/login', async (req, res) => {
     const { username, password } = req.body;
 
-    const userRepository = connection.getRepository(User);
-    const user = await userRepository.findOne({ where: { username } });
+    try {
+      const userRepository = connection.getRepository(User);
+      const user = await userRepository.findOne({ where: { username }, relations: ['employee'] });
 
-    if (user && user.password === password) {
-      res.send({ message: 'Login successful', role: user.role });
-    } else {
-      res.status(401).send('Invalid credentials');
+      if (user && user.password === password) {
+        res.send({ message: 'Login successful', role: user.employee.role });
+      } else {
+        res.status(401).send('Invalid credentials');
+      }
+    } catch (error) {
+      console.error('Login failed:', error);
+      res.status(500).send('Login failed');
     }
   });
 
   app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);
   });
-}).catch(error => console.log(error));
+}).catch(error => console.error('Database connection error:', error));
