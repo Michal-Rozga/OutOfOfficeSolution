@@ -3,12 +3,15 @@ import express from 'express';
 import { createConnection } from 'typeorm';
 import { User } from './entity/User';
 import { Employee } from './entity/Employee';
+import { Project } from './entity/Project';
+import cors from 'cors';
 
 createConnection().then(async connection => {
   const app = express();
   const port = 5000;
 
   app.use(express.json());
+  app.use(cors());
 
   app.get('/roles', async (req, res) => {
     try {
@@ -19,6 +22,27 @@ createConnection().then(async connection => {
       res.status(500).send('Failed to fetch roles');
     }
   });
+
+  app.get('/employees', async (req, res) => {
+    try {
+      const employees = await connection.getRepository(Employee).find();
+      res.json(employees);
+    } catch (error) {
+      console.error('Failed to fetch employees:', error);
+      res.status(500).send('Failed to fetch employees');
+    }
+  });
+
+  app.get('/projects', async (req, res) => {
+    try {
+      const projects = await connection.getRepository(Project).find();
+      res.json(projects);
+    } catch (error) {
+      console.error('Failed to fetch projects:', error);
+      res.status(500).send('Failed to fetch projects');
+    }
+  });
+  
 
   app.post('/register', async (req, res) => {
     const { username, password, role } = req.body;

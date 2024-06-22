@@ -1,5 +1,5 @@
 import React from 'react';
-import Employee from './Employee';
+import Employee from './EmployeeList';
 import Projects from './Projects';
 import LeaveRequest from './LeaveRequest';
 import ApprovalRequest from './ApprovalRequest';
