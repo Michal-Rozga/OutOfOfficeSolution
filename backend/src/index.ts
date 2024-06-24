@@ -4,6 +4,8 @@ import { createConnection } from 'typeorm';
 import { User } from './entity/User';
 import { Employee } from './entity/Employee';
 import { Project } from './entity/Project';
+import { ApprovalRequest } from './entity/ApprovalRequest';
+import { LeaveRequest } from './entity/LeaveRequest';
 import cors from 'cors';
 
 createConnection().then(async connection => {
@@ -92,6 +94,166 @@ createConnection().then(async connection => {
       res.status(500).send('Login failed');
     }
   });
+
+app.get('/approval-requests', async (req, res) => {
+  try {
+    const requests = await connection.getRepository(ApprovalRequest).find();
+    res.json(requests);
+  } catch (error) {
+    console.error('Failed to fetch approval requests:', error);
+    res.status(500).send('Failed to fetch approval requests');
+  }
+});
+
+app.put('/approval-requests/:id/approve', async (req, res) => {
+  try {
+    const request = await connection.getRepository(ApprovalRequest).findOne({ where: { id: parseInt(req.params.id) } });
+    if (request) {
+      request.status = 'approved';
+      await connection.getRepository(ApprovalRequest).save(request);
+      res.send('Request approved successfully');
+    } else {
+      res.status(404).send('Request not found');
+    }
+  } catch (error) {
+    console.error('Failed to approve request:', error);
+    res.status(500).send('Failed to approve request');
+  }
+});
+
+app.put('/approval-requests/:id/reject', async (req, res) => {
+  try {
+    const { comment } = req.body;
+    const request = await connection.getRepository(ApprovalRequest).findOne({ where: { id: parseInt(req.params.id) } });
+    if (request) {
+      request.status = 'rejected';
+      await connection.getRepository(ApprovalRequest).save(request);
+      res.send('Request rejected successfully');
+    } else {
+      res.status(404).send('Request not found');
+    }
+  } catch (error) {
+    console.error('Failed to reject request:', error);
+    res.status(500).send('Failed to reject request');
+  }
+});
+
+app.post('/leave-requests', async (req, res) => {
+  try {
+    const newRequest = req.body;
+    const leaveRequest = await connection.getRepository(LeaveRequest).save(newRequest);
+    res.status(201).json(leaveRequest);
+  } catch (error) {
+    console.error('Failed to create leave request:', error);
+    res.status(500).send('Failed to create leave request');
+  }
+});
+
+// Backend - server.ts or your equivalent file
+
+app.get('/projects', async (req, res) => {
+  try {
+    const projects = await connection.getRepository(Project).find();
+    res.json(projects);
+  } catch (error) {
+    console.error('Failed to fetch projects:', error);
+    res.status(500).send('Failed to fetch projects');
+  }
+});
+
+app.post('/projects', async (req, res) => {
+  try {
+    const project = await connection.getRepository(Project).save(req.body);
+    res.status(201).json(project);
+  } catch (error) {
+    console.error('Failed to create project:', error);
+    res.status(500).send('Failed to create project');
+  }
+});
+
+app.put('/projects/:id', async (req, res) => {
+  try {
+    const project = await connection.getRepository(Project).findOneBy({ id: parseInt(req.params.id) });
+    if (project) {
+      connection.getRepository(Project).merge(project, req.body);
+      await connection.getRepository(Project).save(project);
+      res.send('Project updated successfully');
+    } else {
+      res.status(404).send('Project not found');
+    }
+  } catch (error) {
+    console.error('Failed to update project:', error);
+    res.status(500).send('Failed to update project');
+  }
+});
+
+app.put('/projects/:id/deactivate', async (req, res) => {
+  try {
+    const project = await connection.getRepository(Project).findOneBy({ id: parseInt(req.params.id) });
+    if (project) {
+      project.status = 'closed';
+      await connection.getRepository(Project).save(project);
+      res.send('Project deactivated successfully');
+    } else {
+      res.status(404).send('Project not found');
+    }
+  } catch (error) {
+    console.error('Failed to deactivate project:', error);
+    res.status(500).send('Failed to deactivate project');
+  }
+});
+
+app.get('/projects', async (req, res) => {
+  try {
+    const projects = await connection.getRepository(Project).find();
+    res.json(projects);
+  } catch (error) {
+    console.error('Failed to fetch projects:', error);
+    res.status(500).send('Failed to fetch projects');
+  }
+});
+
+app.post('/projects', async (req, res) => {
+  try {
+    const project = await connection.getRepository(Project).save(req.body);
+    res.status(201).json(project);
+  } catch (error) {
+    console.error('Failed to create project:', error);
+    res.status(500).send('Failed to create project');
+  }
+});
+
+app.put('/projects/:id', async (req, res) => {
+  try {
+    const project = await connection.getRepository(Project).findOneBy({ id: parseInt(req.params.id) });
+    if (project) {
+      connection.getRepository(Project).merge(project, req.body);
+      await connection.getRepository(Project).save(project);
+      res.send('Project updated successfully');
+    } else {
+      res.status(404).send('Project not found');
+    }
+  } catch (error) {
+    console.error('Failed to update project:', error);
+    res.status(500).send('Failed to update project');
+  }
+});
+
+app.put('/projects/:id/deactivate', async (req, res) => {
+  try {
+    const project = await connection.getRepository(Project).findOneBy({ id: parseInt(req.params.id) });
+    if (project) {
+      project.status = 'closed';
+      await connection.getRepository(Project).save(project);
+      res.send('Project deactivated successfully');
+    } else {
+      res.status(404).send('Project not found');
+    }
+  } catch (error) {
+    console.error('Failed to deactivate project:', error);
+    res.status(500).send('Failed to deactivate project');
+  }
+});
 
   app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);
