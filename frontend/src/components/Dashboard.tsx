@@ -1,8 +1,9 @@
 import React from 'react';
 import ApprovalRequest from './ApprovalRequestList';
 import EmployeeList from './EmployeeList';
-import LeaveRequest from './LeaveRequest';
-import Projects from './Projects';
+import LeaveRequest from './LeaveRequestList';
+import Projects from './ProjectList';
+import ProjectList from './ProjectList';
 
 const Dashboard: React.FC = () => {
   const role = localStorage.getItem('role');
@@ -13,7 +14,7 @@ const Dashboard: React.FC = () => {
       <p>Welcome to the dashboard!</p>
       <hr />
       <EmployeeList />
-      <Projects />
+      <ProjectList />
       {role === 'HR Manager' || role === 'Project Manager' ? <LeaveRequest /> : null}
       {role === 'HR Manager' || role === 'Administrator' ? <ApprovalRequest /> : null}
     </div>
