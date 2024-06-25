@@ -3,10 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 const Login: React.FC = () => {
-  const navigate = useNavigate();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [message, setMessage] = useState('');
+  const navigate = useNavigate();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -14,11 +14,20 @@ const Login: React.FC = () => {
       const response = await axios.post('http://localhost:5000/login', { username, password });
       setMessage(response.data.message);
 
-      localStorage.setItem('role', response.data.role);
-
-      navigate('/dashboard');
-    } catch (error) {
-      setMessage('Login failed');
+      if (response.data.role) {
+        localStorage.setItem('role', JSON.stringify(response.data.role));
+        navigate('/dashboard');
+      } else {
+        setMessage('Login failed: Role not found');
+      }
+    } catch (error: any) {
+      if (axios.isAxiosError(error)) {
+        console.error('Axios error:', error);
+        setMessage(`Login failed: ${error.message}`);
+      } else {
+        console.error('Unexpected error:', error);
+        setMessage('Login failed: Unexpected error');
+      }
     }
   };
 
@@ -28,11 +37,19 @@ const Login: React.FC = () => {
       <form onSubmit={handleLogin}>
         <div>
           <label>Username:</label>
-          <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} />
+          <input
+            type="text"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+          />
         </div>
         <div>
           <label>Password:</label>
-          <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
         </div>
         <button type="submit">Login</button>
       </form>

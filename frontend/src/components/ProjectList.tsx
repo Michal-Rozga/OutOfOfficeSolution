@@ -24,8 +24,10 @@ const ProjectList: React.FC = () => {
     try {
       const response = await axios.get('/projects');
       setProjects(response.data);
+      console.log(response.data);
     } catch (error) {
       console.error('Failed to fetch projects:', error);
+      console.log('Failed to fetch projects:', error);
     }
   };
 

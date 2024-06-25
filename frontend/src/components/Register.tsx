@@ -31,9 +31,9 @@ const Register: React.FC = () => {
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      let selectedRoleId: number | undefined;
-
       const existingRole = roles.find(r => r.name === role);
+      let selectedRoleId: number;
+
       if (existingRole) {
         selectedRoleId = existingRole.id;
       } else {
@@ -43,6 +43,8 @@ const Register: React.FC = () => {
 
       const userResponse = await axios.post('http://localhost:5000/register', { username, password, roleId: selectedRoleId });
       setMessage(userResponse.data);
+
+      localStorage.setItem('role', selectedRoleId.toString());
       navigate('/login');
     } catch (error) {
       console.error('Registration failed:', error);
