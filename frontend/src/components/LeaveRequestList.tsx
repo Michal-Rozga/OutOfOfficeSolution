@@ -11,7 +11,7 @@ interface LeaveRequest {
   status: string;
 }
 
-const LeaveRequestComponent: React.FC = () => {
+const LeaveRequestList: React.FC = () => {
   const [requests, setRequests] = useState<LeaveRequest[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [sortConfig, setSortConfig] = useState<{ key: keyof LeaveRequest; direction: 'ascending' | 'descending' } | null>(null);
@@ -80,7 +80,8 @@ const LeaveRequestComponent: React.FC = () => {
     setNewRequest({ startDate: '', endDate: '', type: '' });
   };
 
-  const handleCreateRequest = async () => {
+  const handleCreateRequest = async (e: React.FormEvent) => {
+    e.preventDefault();
     try {
       await axios.post('http://localhost:5000/leave-requests', newRequest);
       alert('Leave request created successfully');
@@ -90,6 +91,34 @@ const LeaveRequestComponent: React.FC = () => {
       setRequests(response.data);
     } catch (error) {
       console.error('Failed to create leave request:', error);
+    }
+  };
+
+  const handleUpdateRequest = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (selectedRequest) {
+      try {
+        await axios.put(`http://localhost:5000/leave-requests/${selectedRequest.id}`, selectedRequest);
+        alert('Leave request updated successfully');
+        setShowDetails(false);
+        // Fetch the updated list of requests
+        const response = await axios.get<LeaveRequest[]>('http://localhost:5000/leave-requests');
+        setRequests(response.data);
+      } catch (error) {
+        console.error('Failed to update leave request:', error);
+      }
+    }
+  };
+
+  const handleCancelRequest = async (id: number) => {
+    try {
+      await axios.put(`http://localhost:5000/leave-requests/${id}/cancel`);
+      alert('Leave request canceled successfully');
+      // Fetch the updated list of requests
+      const response = await axios.get<LeaveRequest[]>('http://localhost:5000/leave-requests');
+      setRequests(response.data);
+    } catch (error) {
+      console.error('Failed to cancel leave request:', error);
     }
   };
 
@@ -127,8 +156,9 @@ const LeaveRequestComponent: React.FC = () => {
               <td>{request.type}</td>
               <td>{request.status}</td>
               <td>
-                {role !== 'Employee' && (
-                  <button onClick={() => handleViewDetails(request.id)}>View Details</button>
+                <button onClick={() => handleViewDetails(request.id)}>View Details</button>
+                {role === 'Employee' && (
+                  <button onClick={() => handleCancelRequest(request.id)}>Cancel</button>
                 )}
               </td>
             </tr>
@@ -137,7 +167,11 @@ const LeaveRequestComponent: React.FC = () => {
       </table>
 
       {showDetails && selectedRequest && (
-        <LeaveRequestDetails request={selectedRequest} onClose={handleFormClose} />
+        <LeaveRequestDetails
+          request={selectedRequest}
+          onClose={handleFormClose}
+          onUpdate={handleUpdateRequest}
+        />
       )}
 
       {showCreateForm && (
@@ -181,19 +215,59 @@ const LeaveRequestComponent: React.FC = () => {
   );
 };
 
-const LeaveRequestDetails: React.FC<{ request: LeaveRequest; onClose: () => void }> = ({ request, onClose }) => {
+const LeaveRequestDetails: React.FC<{ request: LeaveRequest; onClose: () => void; onUpdate: (e: React.FormEvent) => void }> = ({ request, onClose, onUpdate }) => {
+  const [editableRequest, setEditableRequest] = useState<LeaveRequest>(request);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setEditableRequest(prevState => ({
+      ...prevState,
+      [name]: value
+    }));
+  };
+
   return (
     <div>
       <h2>Leave Request Details</h2>
-      <p>Request Number: {request.requestNumber}</p>
-      <p>Employee Name: {request.employeeName}</p>
-      <p>Start Date: {request.startDate}</p>
-      <p>End Date: {request.endDate}</p>
-      <p>Type: {request.type}</p>
-      <p>Status: {request.status}</p>
-      <button onClick={onClose}>Close</button>
+      <form onSubmit={onUpdate}>
+        <p>Request Number: {editableRequest.requestNumber}</p>
+        <p>Employee Name: {editableRequest.employeeName}</p>
+        <label>
+          Start Date:
+          <input
+            type="date"
+            name="startDate"
+            value={editableRequest.startDate}
+            onChange={handleChange}
+          />
+        </label>
+        <label>
+          End Date:
+          <input
+            type="date"
+            name="endDate"
+            value={editableRequest.endDate}
+            onChange={handleChange}
+          />
+        </label>
+        <label>
+          Type:
+          <select
+            name="type"
+            value={editableRequest.type}
+            onChange={handleChange}
+          >
+            <option value="Sick Leave">Sick Leave</option>
+            <option value="Vacation">Vacation</option>
+            <option value="Personal">Personal</option>
+          </select>
+        </label>
+        <p>Status: {editableRequest.status}</p>
+        <button type="submit">Update</button>
+        <button type="button" onClick={onClose}>Close</button>
+      </form>
     </div>
   );
 };
 
-export default LeaveRequestComponent;
+export default LeaveRequestList;
