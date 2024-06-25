@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { useRole } from '../contexts/RoleContext';
 
 interface Employee {
   id: number;
@@ -7,7 +8,10 @@ interface Employee {
   subdivision: string;
   position: string;
   status: string;
-  role: string;
+  role: {
+    id: number;
+    name: string;
+  };
 }
 
 interface Project {
@@ -24,7 +28,7 @@ const EmployeeList: React.FC = () => {
   const [showDetailsForm, setShowDetailsForm] = useState(false);
   const [showAddForm, setShowAddForm] = useState(false);
   const [showAssignForm, setShowAssignForm] = useState(false);
-  const role = localStorage.getItem('role');
+  const { role } = useRole();
 
   useEffect(() => {
     const fetchEmployees = async () => {
@@ -67,6 +71,8 @@ const EmployeeList: React.FC = () => {
   const filteredEmployees = sortedEmployees.filter(employee =>
     employee.fullName.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  console.log('Filtered Employees:', filteredEmployees); // Add this line
 
   const handleEdit = (id: number) => {
     const employee = employees.find(e => e.id === id);
@@ -141,7 +147,7 @@ const EmployeeList: React.FC = () => {
               <td>{employee.subdivision}</td>
               <td>{employee.position}</td>
               <td>{employee.status}</td>
-              <td>{employee.role}</td>
+              <td>{employee.role.name}</td> {/* Updated to render role name */}
               {(role === 'HR Manager' || role === 'Administrator') && (
                 <td>
                   <button onClick={() => handleEdit(employee.id)}>Edit</button>
@@ -224,7 +230,7 @@ const EditEmployeeForm: React.FC<{ employee: Employee; onClose: () => void }> = 
       </label>
       <label>
         Role:
-        <input type="text" name="role" value={formData.role} onChange={handleChange} />
+        <input type="text" name="role" value={formData.role.name} onChange={handleChange} /> {/* Updated to render role name */}
       </label>
       <button type="submit">Save</button>
       <button type="button" onClick={onClose}>Cancel</button>
@@ -244,15 +250,14 @@ const EmployeeDetailsForm: React.FC<{ employee: Employee; onClose: () => void }>
       <p>Subdivision: {employee.subdivision}</p>
       <p>Position: {employee.position}</p>
       <p>Status: {employee.status}</p>
-      <p>Role: {employee.role}</p>
+      <p>Role: {employee.role.name}</p> {/* Updated to render role name */}
       <button onClick={onClose}>Close</button>
     </div>
   );
 };
 
 const AddEmployeeForm: React.FC<{ onClose: () => void }> = ({ onClose }) => {
-  const [formData, setFormData] = useState<Employee>({
-    id: 0,
+  const [formData, setFormData] = useState({
     fullName: '',
     subdivision: '',
     position: '',
@@ -301,7 +306,7 @@ const AddEmployeeForm: React.FC<{ onClose: () => void }> = ({ onClose }) => {
         Role:
         <input type="text" name="role" value={formData.role} onChange={handleChange} />
       </label>
-      <button type="submit">Save</button>
+      <button type="submit">Add</button>
       <button type="button" onClick={onClose}>Cancel</button>
     </form>
   );
@@ -309,13 +314,14 @@ const AddEmployeeForm: React.FC<{ onClose: () => void }> = ({ onClose }) => {
 
 const AssignProjectForm: React.FC<{ employee: Employee; onClose: () => void }> = ({ employee, onClose }) => {
   const [projects, setProjects] = useState<Project[]>([]);
-  const [selectedProjectId, setSelectedProjectId] = useState<number | null>(null);
+  const [selectedProject, setSelectedProject] = useState<number | null>(null);
 
   useEffect(() => {
     const fetchProjects = async () => {
       try {
         const response = await axios.get<Project[]>('http://localhost:5000/projects');
         setProjects(response.data);
+        console.log('Fetched projects:', response.data);
       } catch (error) {
         console.error('Failed to fetch projects:', error);
       }
@@ -324,39 +330,37 @@ const AssignProjectForm: React.FC<{ employee: Employee; onClose: () => void }> =
     fetchProjects();
   }, []);
 
-  const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setSelectedProjectId(parseInt(e.target.value, 10));
-  };
+  const handleAssign = async () => {
+    if (selectedProject === null) return;
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (selectedProjectId !== null) {
-      try {
-        await axios.post(`http://localhost:5000/employees/${employee.id}/assign`, { projectId: selectedProjectId });
-        onClose();
-      } catch (error) {
-        console.error('Failed to assign project:', error);
-      }
+    try {
+      await axios.post('http://localhost:5000/employee_projects', {
+        employeeId: employee.id,
+        projectId: selectedProject,
+      });
+      onClose();
+    } catch (error) {
+      console.error('Failed to assign project:', error);
     }
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <h2>Assign Project to {employee.fullName}</h2>
+    <div>
+      <h2>Assign Project</h2>
       <label>
         Project:
-        <select value={selectedProjectId || ''} onChange={handleChange}>
+        <select value={selectedProject ?? ''} onChange={(e) => setSelectedProject(Number(e.target.value))}>
           <option value="" disabled>Select a project</option>
-          {projects.map(project => (
+          {projects.map((project) => (
             <option key={project.id} value={project.id}>
               {project.name}
             </option>
           ))}
         </select>
       </label>
-      <button type="submit">Assign</button>
-      <button type="button" onClick={onClose}>Cancel</button>
-    </form>
+      <button onClick={handleAssign}>Assign</button>
+      <button onClick={onClose}>Cancel</button>
+    </div>
   );
 };
 

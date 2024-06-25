@@ -56,7 +56,8 @@ const ApprovalRequestList: React.FC = () => {
   }, [requests, sortConfig]);
 
   const filteredRequests = sortedRequests.filter(request =>
-    request.requestNumber.toLowerCase().includes(searchTerm.toLowerCase())
+    request.id.toString().toLowerCase().includes(searchTerm.toLowerCase())
+    //request.requestNumber.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const handleViewDetails = (id: number) => {

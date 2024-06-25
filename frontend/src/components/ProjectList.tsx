@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import ProjectDetails from './ProjectDetails';
+import { useRole } from '../contexts/RoleContext';
 
 interface Project {
   id: number;
@@ -14,7 +15,7 @@ const ProjectList: React.FC = () => {
   const [sortColumn, setSortColumn] = useState<keyof Project | ''>('');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
-  const role = localStorage.getItem('role');
+  const { role } = useRole();
 
   useEffect(() => {
     fetchProjects();
@@ -22,7 +23,7 @@ const ProjectList: React.FC = () => {
 
   const fetchProjects = async () => {
     try {
-      const response = await axios.get('/projects');
+      const response = await axios.get<Project[]>('http://localhost:5000/projects');
       setProjects(response.data);
       console.log(response.data);
     } catch (error) {
@@ -82,7 +83,7 @@ const ProjectList: React.FC = () => {
   };
 
   const filteredProjects = projects.filter(project => {
-    return project.name.toLowerCase().includes(filter.toLowerCase()) ||
+    return project.name?.toLowerCase().includes(filter.toLowerCase()) ||
            project.id.toString().includes(filter);
   });
 

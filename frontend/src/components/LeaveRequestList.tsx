@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { useRole } from '../contexts/RoleContext';
 
 interface LeaveRequest {
   id: number;
@@ -19,7 +20,7 @@ const LeaveRequestList: React.FC = () => {
   const [showDetails, setShowDetails] = useState(false);
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [newRequest, setNewRequest] = useState({ startDate: '', endDate: '', type: '' });
-  const role = localStorage.getItem('role');
+  const { role } = useRole();
 
   useEffect(() => {
     const fetchRequests = async () => {
@@ -59,7 +60,8 @@ const LeaveRequestList: React.FC = () => {
   }, [requests, sortConfig]);
 
   const filteredRequests = sortedRequests.filter(request =>
-    request.requestNumber.toLowerCase().includes(searchTerm.toLowerCase())
+    request.id.toString().toLowerCase().includes(searchTerm.toLowerCase())
+    // request.requestNumber.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const handleViewDetails = (id: number) => {
@@ -86,7 +88,6 @@ const LeaveRequestList: React.FC = () => {
       await axios.post('http://localhost:5000/leave-requests', newRequest);
       alert('Leave request created successfully');
       setShowCreateForm(false);
-      // Fetch the updated list of requests
       const response = await axios.get<LeaveRequest[]>('http://localhost:5000/leave-requests');
       setRequests(response.data);
     } catch (error) {
@@ -101,7 +102,6 @@ const LeaveRequestList: React.FC = () => {
         await axios.put(`http://localhost:5000/leave-requests/${selectedRequest.id}`, selectedRequest);
         alert('Leave request updated successfully');
         setShowDetails(false);
-        // Fetch the updated list of requests
         const response = await axios.get<LeaveRequest[]>('http://localhost:5000/leave-requests');
         setRequests(response.data);
       } catch (error) {
@@ -114,7 +114,6 @@ const LeaveRequestList: React.FC = () => {
     try {
       await axios.put(`http://localhost:5000/leave-requests/${id}/cancel`);
       alert('Leave request canceled successfully');
-      // Fetch the updated list of requests
       const response = await axios.get<LeaveRequest[]>('http://localhost:5000/leave-requests');
       setRequests(response.data);
     } catch (error) {

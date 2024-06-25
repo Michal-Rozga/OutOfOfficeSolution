@@ -128,6 +128,16 @@ app.put('/approval-requests/:id/reject', async (req, res) => {
   }
 });
 
+app.get('/leave-requests', async (req, res) => {
+  try {
+  const requests = await connection.getRepository(LeaveRequest).find();
+  res.json(requests);
+  } catch (error) {
+    console.error('Failed to fetch leave requests:', error);
+    res.status(500).send('Failed to fetch leave requests');
+  }
+});
+
 app.post('/leave-requests', async (req, res) => {
   try {
     const newRequest = req.body;
