@@ -1,0 +1,44 @@
+.container {
+    padding: 20px;
+}
+
+.searchInput {
+margin-bottom: 20px;
+padding: 10px;
+font-size: 16px;
+width: 100%;
+}
+
+.table {
+width: 100%;
+border-collapse: collapse;
+
+th, td {
+    padding: 10px;
+    border: 1px solid #ccc;
+    text-align: left;
+}
+
+th {
+    cursor: pointer;
+    background-color: #f9f9f9;
+}
+}
+
+.actions {
+display: flex;
+gap: 10px;
+}
+
+button {
+padding: 5px 10px;
+font-size: 14px;
+cursor: pointer;
+}
+
+.details {
+background-color: #f9f9f9;
+padding: 20px;
+margin-top: 20px;
+border: 1px solid #ccc;
+}

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import styles from '../styles/ApprovalRequestList.module.scss';
 
 interface Employee {
   id: number;
@@ -127,15 +128,16 @@ const ApprovalRequestList: React.FC = () => {
   };
 
   return (
-    <div>
+    <div className={styles.container}>
       <h2>Approval Requests</h2>
       <input
         type="text"
         placeholder="Search by request number"
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
+        className={styles.searchInput}
       />
-      <table>
+      <table className={styles.table}>
         <thead>
           <tr>
             <th onClick={() => handleSort('id')}>Request Number</th>
@@ -156,7 +158,7 @@ const ApprovalRequestList: React.FC = () => {
               <td>{formatDate(request.leaveRequest.endDate)}</td>
               <td>{request.leaveRequest.absenceReason}</td>
               <td>{request.status}</td>
-              <td>
+              <td className={styles.actions}>
                 <button onClick={() => handleViewDetails(request.id)}>View Details</button>
                 <button onClick={() => handleApprove(request.id)}>Approve</button>
                 <button onClick={() => handleReject(request.id, prompt("Enter rejection comment:"))}>Reject</button>
@@ -175,7 +177,7 @@ const ApprovalRequestList: React.FC = () => {
 
 const ApprovalRequestDetails: React.FC<{ request: ApprovalRequest; onClose: () => void }> = ({ request, onClose }) => {
   return (
-    <div>
+    <div className={styles.details}>
       <h2>Approval Request Details</h2>
       <p>Request Number: {request.id}</p>
       <p>Employee Name: {request.leaveRequest.employee.fullName}</p>

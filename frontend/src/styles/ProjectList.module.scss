@@ -1,0 +1,93 @@
+$primary-color: #007bff;
+$background-color: #f8f9fa;
+$border-color: #ced4da;
+$table-header-bg: #e9ecef;
+$input-padding: 8px;
+$button-padding: 10px 15px;
+$border-radius: 4px;
+
+.projectListContainer {
+  padding: 20px;
+  background-color: $background-color;
+  border: 1px solid $border-color;
+  border-radius: $border-radius;
+  max-width: 800px;
+  margin: auto;
+
+  h1 {
+    margin-bottom: 20px;
+    color: $primary-color;
+  }
+
+  input[type="text"] {
+    width: 100%;
+    padding: $input-padding;
+    border: 1px solid $border-color;
+    border-radius: $border-radius;
+    margin-bottom: 20px;
+    font-size: 1em;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+
+    th {
+      background-color: $table-header-bg;
+      color: #333;
+      cursor: pointer;
+      padding: $input-padding;
+      border: 1px solid $border-color;
+      text-align: left;
+    }
+
+    td {
+      padding: $input-padding;
+      border: 1px solid $border-color;
+    }
+
+    tbody tr:nth-child(even) {
+      background-color: #f2f2f2;
+    }
+
+    tbody tr:hover {
+      background-color: #ddd;
+    }
+
+    button {
+      padding: $button-padding;
+      border: none;
+      border-radius: $border-radius;
+      background-color: $primary-color;
+      color: #fff;
+      cursor: pointer;
+      margin-right: 10px;
+
+      &:hover {
+        background-color: darken($primary-color, 10%);
+      }
+
+      &:last-of-type {
+        background-color: #dc3545;
+
+        &:hover {
+          background-color: darken(#dc3545, 10%);
+        }
+      }
+    }
+  }
+}
+
+.addProjectButton {
+  padding: $button-padding;
+  border: none;
+  border-radius: $border-radius;
+  background-color: $primary-color;
+  color: #fff;
+  cursor: pointer;
+
+  &:hover {
+    background-color: darken($primary-color, 10%);
+  }
+}

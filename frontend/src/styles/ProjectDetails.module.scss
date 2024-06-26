@@ -1,0 +1,80 @@
+$primary-color: #007bff;
+$background-color: #f8f9fa;
+$border-color: #ced4da;
+$input-padding: 8px;
+$button-padding: 10px 15px;
+$border-radius: 4px;
+
+.projectDetailsContainer {
+  padding: 20px;
+  background-color: $background-color;
+  border: 1px solid $border-color;
+  border-radius: $border-radius;
+  max-width: 600px;
+  margin: auto;
+
+  h2 {
+    margin-bottom: 20px;
+    color: $primary-color;
+  }
+
+  h3 {
+    margin-top: 20px;
+    color: $primary-color;
+  }
+
+  div {
+    margin-bottom: 15px;
+    
+    label {
+      display: block;
+      margin-bottom: 5px;
+      color: #333;
+      font-weight: bold;
+    }
+
+    input, textarea {
+      width: 100%;
+      padding: $input-padding;
+      border: 1px solid $border-color;
+      border-radius: $border-radius;
+      font-size: 1em;
+    }
+
+    span {
+      display: block;
+      padding: $input-padding;
+      background-color: #fff;
+      border: 1px solid $border-color;
+      border-radius: $border-radius;
+    }
+  }
+
+  img {
+    max-width: 100px;
+    margin-top: 10px;
+    border-radius: $border-radius;
+  }
+
+  button {
+    padding: $button-padding;
+    border: none;
+    border-radius: $border-radius;
+    background-color: $primary-color;
+    color: #fff;
+    cursor: pointer;
+    margin-right: 10px;
+
+    &:hover {
+      background-color: darken($primary-color, 10%);
+    }
+
+    &:last-of-type {
+      background-color: #6c757d;
+
+      &:hover {
+        background-color: darken(#6c757d, 10%);
+      }
+    }
+  }
+}

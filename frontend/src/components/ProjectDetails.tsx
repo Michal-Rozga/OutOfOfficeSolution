@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import styles from '../styles/ProjectDetails.module.scss';
 
 interface Project {
   id: number;
@@ -52,7 +53,7 @@ const ProjectDetails: React.FC<ProjectDetailsProps> = ({ project, onClose, onSav
   };
 
   return (
-    <div>
+    <div className={styles.projectDetailsContainer}>
       <h2>Project Details</h2>
       <p>ID: {project.id}</p>
       <div>

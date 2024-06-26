@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useRole } from '../contexts/RoleContext';
+import styles from '../styles/EmployeeList.module.scss';
 
 interface Employee {
   id: number;
@@ -72,8 +73,6 @@ const EmployeeList: React.FC = () => {
     employee.fullName.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  console.log('Filtered Employees:', filteredEmployees); // Add this line
-
   const handleEdit = (id: number) => {
     const employee = employees.find(e => e.id === id);
     if (employee) {
@@ -120,52 +119,58 @@ const EmployeeList: React.FC = () => {
   };
 
   return (
-    <div>
-      <h2>Employee List</h2>
-      <input
-        type="text"
-        placeholder="Search by name"
-        value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
-      />
-      <table>
-        <thead>
-          <tr>
-            <th onClick={() => handleSort('fullName')}>Name</th>
-            <th onClick={() => handleSort('subdivision')}>Subdivision</th>
-            <th onClick={() => handleSort('position')}>Position</th>
-            <th onClick={() => handleSort('status')}>Status</th>
-            <th onClick={() => handleSort('role')}>Role</th>
-            {(role === 'HR Manager' || role === 'Administrator') && <th>Actions</th>}
-            {(role === 'Project Manager' || role === 'Administrator') && <th>Details</th>}
-          </tr>
-        </thead>
-        <tbody>
-          {filteredEmployees.map(employee => (
-            <tr key={employee.id}>
-              <td>{employee.fullName}</td>
-              <td>{employee.subdivision}</td>
-              <td>{employee.position}</td>
-              <td>{employee.status}</td>
-              <td>{employee.role.name}</td> {/* Updated to render role name */}
-              {(role === 'HR Manager' || role === 'Administrator') && (
-                <td>
-                  <button onClick={() => handleEdit(employee.id)}>Edit</button>
-                  <button onClick={() => handleDeactivate(employee.id)}>Deactivate</button>
-                </td>
-              )}
-              {(role === 'Project Manager' || role === 'Administrator') && (
-                <td>
-                  <button onClick={() => handleViewDetails(employee.id)}>View Details</button>
-                  <button onClick={() => handleAssignToProject(employee.id)}>Assign to Project</button>
-                </td>
-              )}
+    <div className={styles.container}>
+      <h2 className={styles.heading}>Employee List</h2>
+      <div className={styles.inputContainer}>
+        <input
+          type="text"
+          placeholder="Search by name"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
+      </div>
+      <div className={styles.tableContainer}>
+        <table>
+          <thead>
+            <tr>
+              <th onClick={() => handleSort('fullName')}>Name</th>
+              <th onClick={() => handleSort('subdivision')}>Subdivision</th>
+              <th onClick={() => handleSort('position')}>Position</th>
+              <th onClick={() => handleSort('status')}>Status</th>
+              <th onClick={() => handleSort('role')}>Role</th>
+              {(role === 'HR Manager' || role === 'Administrator') && <th className={styles.actions}>Actions</th>}
+              {(role === 'Project Manager' || role === 'Administrator') && <th>Details</th>}
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {filteredEmployees.map(employee => (
+              <tr key={employee.id}>
+                <td>{employee.fullName}</td>
+                <td>{employee.subdivision}</td>
+                <td>{employee.position}</td>
+                <td>{employee.status}</td>
+                <td>{employee.role.name}</td>
+                {(role === 'HR Manager' || role === 'Administrator') && (
+                  <td className={styles.actions}>
+                    <button onClick={() => handleEdit(employee.id)}>Edit</button>
+                    <button onClick={() => handleDeactivate(employee.id)}>Deactivate</button>
+                  </td>
+                )}
+                {(role === 'Project Manager' || role === 'Administrator') && (
+                  <td>
+                    <button onClick={() => handleViewDetails(employee.id)}>View Details</button>
+                    <button onClick={() => handleAssignToProject(employee.id)}>Assign to Project</button>
+                  </td>
+                )}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
       {(role === 'HR Manager' || role === 'Administrator') && (
-        <button onClick={handleAddEmployee}>Add Employee</button>
+        <div className={styles.formContainer}>
+          <button onClick={handleAddEmployee}>Add Employee</button>
+        </div>
       )}
 
       {showEditForm && selectedEmployee && (
@@ -207,7 +212,7 @@ const EditEmployeeForm: React.FC<{ employee: Employee; onClose: () => void }> = 
   };
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form className={styles.formContainer} onSubmit={handleSubmit}>
       <h2>Edit Employee</h2>
       <label>
         Name:
@@ -230,7 +235,7 @@ const EditEmployeeForm: React.FC<{ employee: Employee; onClose: () => void }> = 
       </label>
       <label>
         Role:
-        <input type="text" name="role" value={formData.role.name} onChange={handleChange} /> {/* Updated to render role name */}
+        <input type="text" name="role" value={formData.role.name} onChange={handleChange} />
       </label>
       <button type="submit">Save</button>
       <button type="button" onClick={onClose}>Cancel</button>
@@ -244,25 +249,26 @@ const EmployeeDetailsForm: React.FC<{ employee: Employee; onClose: () => void }>
   }, [employee]);
 
   return (
-    <div>
+    <div className={styles.detailsForm}>
       <h2>Employee Details</h2>
-      <p>Name: {employee.fullName}</p>
-      <p>Subdivision: {employee.subdivision}</p>
-      <p>Position: {employee.position}</p>
-      <p>Status: {employee.status}</p>
-      <p>Role: {employee.role.name}</p> {/* Updated to render role name */}
+      <p><strong>Name:</strong> {employee.fullName}</p>
+      <p><strong>Subdivision:</strong> {employee.subdivision}</p>
+      <p><strong>Position:</strong> {employee.position}</p>
+      <p><strong>Status:</strong> {employee.status}</p>
+      <p><strong>Role:</strong> {employee.role.name}</p>
       <button onClick={onClose}>Close</button>
     </div>
   );
 };
 
 const AddEmployeeForm: React.FC<{ onClose: () => void }> = ({ onClose }) => {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<Employee>({
+    id: 0,
     fullName: '',
     subdivision: '',
     position: '',
     status: 'active',
-    role: '',
+    role: { id: 0, name: '' },
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -281,7 +287,7 @@ const AddEmployeeForm: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form className={styles.formContainer} onSubmit={handleSubmit}>
       <h2>Add Employee</h2>
       <label>
         Name:
@@ -304,24 +310,23 @@ const AddEmployeeForm: React.FC<{ onClose: () => void }> = ({ onClose }) => {
       </label>
       <label>
         Role:
-        <input type="text" name="role" value={formData.role} onChange={handleChange} />
+        <input type="text" name="role" value={formData.role.name} onChange={handleChange} />
       </label>
-      <button type="submit">Add</button>
+      <button type="submit">Save</button>
       <button type="button" onClick={onClose}>Cancel</button>
     </form>
   );
 };
 
 const AssignProjectForm: React.FC<{ employee: Employee; onClose: () => void }> = ({ employee, onClose }) => {
+  const [projectId, setProjectId] = useState<number | null>(null);
   const [projects, setProjects] = useState<Project[]>([]);
-  const [selectedProject, setSelectedProject] = useState<number | null>(null);
 
   useEffect(() => {
     const fetchProjects = async () => {
       try {
         const response = await axios.get<Project[]>('http://localhost:5000/projects');
         setProjects(response.data);
-        console.log('Fetched projects:', response.data);
       } catch (error) {
         console.error('Failed to fetch projects:', error);
       }
@@ -330,37 +335,33 @@ const AssignProjectForm: React.FC<{ employee: Employee; onClose: () => void }> =
     fetchProjects();
   }, []);
 
-  const handleAssign = async () => {
-    if (selectedProject === null) return;
-
-    try {
-      await axios.post('http://localhost:5000/employee_projects', {
-        employeeId: employee.id,
-        projectId: selectedProject,
-      });
-      onClose();
-    } catch (error) {
-      console.error('Failed to assign project:', error);
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (projectId !== null) {
+      try {
+        await axios.post(`http://localhost:5000/projects/${projectId}/assign`, { employeeId: employee.id });
+        onClose();
+      } catch (error) {
+        console.error('Failed to assign project:', error);
+      }
     }
   };
 
   return (
-    <div>
+    <form className={styles.formContainer} onSubmit={handleSubmit}>
       <h2>Assign Project</h2>
       <label>
         Project:
-        <select value={selectedProject ?? ''} onChange={(e) => setSelectedProject(Number(e.target.value))}>
+        <select value={projectId ?? ''} onChange={(e) => setProjectId(Number(e.target.value))}>
           <option value="" disabled>Select a project</option>
-          {projects.map((project) => (
-            <option key={project.id} value={project.id}>
-              {project.name}
-            </option>
+          {projects.map(project => (
+            <option key={project.id} value={project.id}>{project.name}</option>
           ))}
         </select>
       </label>
-      <button onClick={handleAssign}>Assign</button>
-      <button onClick={onClose}>Cancel</button>
-    </div>
+      <button type="submit">Assign</button>
+      <button type="button" onClick={onClose}>Cancel</button>
+    </form>
   );
 };
 

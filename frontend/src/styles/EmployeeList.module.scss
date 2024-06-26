@@ -1,0 +1,80 @@
+.container {
+    padding: 20px;
+}
+
+.heading {
+font-size: 24px;
+margin-bottom: 10px;
+}
+
+.inputContainer {
+margin-bottom: 20px;
+}
+
+.tableContainer {
+overflow-x: auto;
+}
+
+table {
+width: 100%;
+border-collapse: collapse;
+margin-top: 10px;
+}
+
+th,
+td {
+padding: 10px;
+border: 1px solid #ddd;
+text-align: left;
+}
+
+th {
+background-color: #f2f2f2;
+cursor: pointer;
+}
+
+tr:nth-child(even) {
+background-color: #f2f2f2;
+}
+
+tr:hover {
+background-color: #ddd;
+}
+
+.actions {
+display: flex;
+gap: 10px;
+}
+
+.formContainer {
+margin-top: 20px;
+}
+
+.formContainer form {
+display: grid;
+gap: 10px;
+}
+
+.formContainer label {
+display: flex;
+flex-direction: column;
+}
+
+.formContainer input[type='text'],
+.formContainer input[type='password'],
+.formContainer select {
+padding: 8px;
+font-size: 14px;
+}
+
+.formContainer button {
+padding: 8px 12px;
+background-color: #007bff;
+color: white;
+border: none;
+cursor: pointer;
+}
+
+.formContainer button:hover {
+background-color: #0056b3;
+}  

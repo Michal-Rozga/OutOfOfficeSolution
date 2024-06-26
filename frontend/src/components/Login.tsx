@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import styles from '../styles/Login.module.scss';
 
 const Login: React.FC = () => {
   const [username, setUsername] = useState('');
@@ -32,7 +33,7 @@ const Login: React.FC = () => {
   };
 
   return (
-    <div>
+    <div className={styles.loginContainer}>
       <h2>Login</h2>
       <form onSubmit={handleLogin}>
         <div>

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import ProjectDetails from './ProjectDetails';
 import { useRole } from '../contexts/RoleContext';
+import styles from '../styles/ProjectList.module.scss';
 
 interface Project {
   id: number;
@@ -46,7 +47,6 @@ const ProjectList: React.FC = () => {
       console.log(response.data);
     } catch (error) {
       console.error('Failed to fetch projects:', error);
-      console.log('Failed to fetch projects:', error);
     }
   };
 
@@ -138,7 +138,7 @@ const ProjectList: React.FC = () => {
   };
 
   return (
-    <div>
+    <div className={styles.projectListContainer}>
       <h1>Project List</h1>
       <input
         type="text"
@@ -183,7 +183,7 @@ const ProjectList: React.FC = () => {
         </tbody>
       </table>
       {role !== 'Employee' && (
-        <button onClick={handleAddProject}>Add Project</button>
+        <button className={styles.addProjectButton} onClick={handleAddProject}>Add Project</button>
       )}
 
       {selectedProject && (

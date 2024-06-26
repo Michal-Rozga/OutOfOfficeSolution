@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import styles from '../styles/Register.module.scss';
 
 interface Role {
   id: number;
@@ -53,7 +54,7 @@ const Register: React.FC = () => {
   };
 
   return (
-    <div>
+    <div className={styles['register-container']}>
       <h2>Register</h2>
       <form onSubmit={handleRegister}>
         <div>

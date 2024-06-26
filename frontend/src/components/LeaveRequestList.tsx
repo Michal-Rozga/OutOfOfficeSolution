@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useRole } from '../contexts/RoleContext';
+import styles from '../styles/LeaveRequestList.module.scss';
 
 interface LeaveRequest {
   id: number;
@@ -138,7 +139,7 @@ const LeaveRequestList: React.FC = () => {
   };
 
   return (
-    <div>
+    <div className={styles.container}>
       <h2>Leave Requests</h2>
       {role === 'Employee' && (
         <button onClick={() => setShowCreateForm(true)}>Create New Leave Request</button>
@@ -182,7 +183,7 @@ const LeaveRequestList: React.FC = () => {
       </table>
 
       {showDetails && selectedRequest && (
-        <div>
+        <div className={styles.formContainer}>
           <h3>Leave Request Details</h3>
           <form onSubmit={handleUpdateRequest}>
             <p>Request Number: {selectedRequest.id}</p>
@@ -231,7 +232,7 @@ const LeaveRequestList: React.FC = () => {
       )}
 
       {showCreateForm && (
-        <div>
+        <div className={styles.formContainer}>
           <h3>Create Leave Request</h3>
           <form onSubmit={handleCreateRequest}>
             <label>
