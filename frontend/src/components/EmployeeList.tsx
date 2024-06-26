@@ -17,7 +17,7 @@ interface Employee {
 
 interface Project {
   id: number;
-  name: string;
+  projectType: string;
 }
 
 const EmployeeList: React.FC = () => {
@@ -355,7 +355,7 @@ const AssignProjectForm: React.FC<{ employee: Employee; onClose: () => void }> =
         <select value={projectId ?? ''} onChange={(e) => setProjectId(Number(e.target.value))}>
           <option value="" disabled>Select a project</option>
           {projects.map(project => (
-            <option key={project.id} value={project.id}>{project.name}</option>
+            <option key={project.id} value={project.id}>{project.projectType}</option>
           ))}
         </select>
       </label>

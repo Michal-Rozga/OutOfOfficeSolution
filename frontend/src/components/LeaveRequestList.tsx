@@ -7,7 +7,7 @@ interface LeaveRequest {
   id: number;
   startDate: string;
   endDate: string;
-  type: string;
+  absenceReason: string;
   status: string;
   employee: {
     id: number;
@@ -157,7 +157,7 @@ const LeaveRequestList: React.FC = () => {
             <th onClick={() => handleSort('employee.fullName' as keyof LeaveRequest)}>Employee Name</th>
             <th onClick={() => handleSort('startDate')}>Start Date</th>
             <th onClick={() => handleSort('endDate')}>End Date</th>
-            <th onClick={() => handleSort('type')}>Type</th>
+            <th onClick={() => handleSort('absenceReason')}>Type</th>
             <th onClick={() => handleSort('status')}>Status</th>
             <th>Actions</th>
           </tr>
@@ -169,7 +169,7 @@ const LeaveRequestList: React.FC = () => {
               <td>{request.employee.fullName}</td>
               <td>{formatDate(request.startDate)}</td>
               <td>{formatDate(request.endDate)}</td>
-              <td>{request.type}</td>
+              <td>{request.absenceReason}</td>
               <td>{request.status}</td>
               <td>
                 <button onClick={() => handleViewDetails(request.id)}>View Details</button>
@@ -214,9 +214,9 @@ const LeaveRequestList: React.FC = () => {
               Type:
               <select
                 name="type"
-                value={selectedRequest.type}
+                value={selectedRequest.absenceReason}
                 onChange={(e) =>
-                  setSelectedRequest({ ...selectedRequest, type: e.target.value })
+                  setSelectedRequest({ ...selectedRequest, absenceReason: e.target.value })
                 }
               >
                 <option value="Sick Leave">Sick Leave</option>
