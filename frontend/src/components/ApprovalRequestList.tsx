@@ -1,15 +1,43 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
-interface ApprovalRequest {
+interface Employee {
   id: number;
-  requestNumber: string;
-  employeeName: string;
+  fullName: string;
+  subdivision: string;
+  position: string;
+  status: string;
+  peoplePartner: string;
+  outOfOfficeBalance: number;
+  photo: string | null;
+  role: {
+    id: number;
+    name: string;
+  };
+}
+
+interface LeaveRequest {
+  id: number;
+  absenceReason: string;
   startDate: string;
   endDate: string;
-  type: string;
+  comment: string | null;
   status: string;
+  employee: Employee;
 }
+
+interface ApprovalRequest {
+  id: number;
+  status: string;
+  comment: string | null;
+  approver: Employee;
+  leaveRequest: LeaveRequest;
+}
+
+const formatDate = (date: string) => {
+  const options: Intl.DateTimeFormatOptions = { day: '2-digit', month: '2-digit', year: 'numeric' };
+  return new Date(date).toLocaleDateString(undefined, options);
+};
 
 const ApprovalRequestList: React.FC = () => {
   const [requests, setRequests] = useState<ApprovalRequest[]>([]);
@@ -43,10 +71,13 @@ const ApprovalRequestList: React.FC = () => {
     let sortableRequests = [...requests];
     if (sortConfig !== null) {
       sortableRequests.sort((a, b) => {
-        if (a[sortConfig.key] < b[sortConfig.key]) {
+        const aValue = a[sortConfig.key] ?? '';
+        const bValue = b[sortConfig.key] ?? '';
+
+        if (aValue < bValue) {
           return sortConfig.direction === 'ascending' ? -1 : 1;
         }
-        if (a[sortConfig.key] > b[sortConfig.key]) {
+        if (aValue > bValue) {
           return sortConfig.direction === 'ascending' ? 1 : -1;
         }
         return 0;
@@ -56,8 +87,7 @@ const ApprovalRequestList: React.FC = () => {
   }, [requests, sortConfig]);
 
   const filteredRequests = sortedRequests.filter(request =>
-    request.id.toString().toLowerCase().includes(searchTerm.toLowerCase())
-    //request.requestNumber.toLowerCase().includes(searchTerm.toLowerCase())
+    request.id.toString().includes(searchTerm.toLowerCase())
   );
 
   const handleViewDetails = (id: number) => {
@@ -71,7 +101,7 @@ const ApprovalRequestList: React.FC = () => {
   const handleApprove = async (id: number) => {
     try {
       await axios.put(`http://localhost:5000/approval-requests/${id}/approve`);
-      setRequests(requests.map(r => (r.id === id ? { ...r, status: 'approved' } : r)));
+      setRequests(requests.map(r => (r.id === id ? { ...r, status: 'Approved' } : r)));
     } catch (error) {
       console.error('Failed to approve request:', error);
     }
@@ -80,7 +110,7 @@ const ApprovalRequestList: React.FC = () => {
   const handleReject = async (id: number, comment: string | null) => {
     try {
       await axios.put(`http://localhost:5000/approval-requests/${id}/reject`, { comment: comment || '' });
-      setRequests(requests.map(r => (r.id === id ? { ...r, status: 'rejected' } : r)));
+      setRequests(requests.map(r => (r.id === id ? { ...r, status: 'Rejected' } : r)));
     } catch (error) {
       console.error('Failed to reject request:', error);
     }
@@ -89,6 +119,11 @@ const ApprovalRequestList: React.FC = () => {
   const handleFormClose = () => {
     setShowDetails(false);
     setSelectedRequest(null);
+  };
+
+  const formatDate = (date: string) => {
+    const options: Intl.DateTimeFormatOptions = { day: '2-digit', month: '2-digit', year: 'numeric' };
+    return new Date(date).toLocaleDateString(undefined, options);
   };
 
   return (
@@ -103,11 +138,11 @@ const ApprovalRequestList: React.FC = () => {
       <table>
         <thead>
           <tr>
-            <th onClick={() => handleSort('requestNumber')}>Request Number</th>
-            <th onClick={() => handleSort('employeeName')}>Employee Name</th>
-            <th onClick={() => handleSort('startDate')}>Start Date</th>
-            <th onClick={() => handleSort('endDate')}>End Date</th>
-            <th onClick={() => handleSort('type')}>Type</th>
+            <th onClick={() => handleSort('id')}>Request Number</th>
+            <th onClick={() => handleSort('leaveRequest.employee.fullName' as keyof ApprovalRequest)}>Employee Name</th>
+            <th onClick={() => handleSort('leaveRequest.startDate' as keyof ApprovalRequest)}>Start Date</th>
+            <th onClick={() => handleSort('leaveRequest.endDate' as keyof ApprovalRequest)}>End Date</th>
+            <th onClick={() => handleSort('leaveRequest.absenceReason' as keyof ApprovalRequest)}>Reason</th>
             <th onClick={() => handleSort('status')}>Status</th>
             <th>Actions</th>
           </tr>
@@ -115,11 +150,11 @@ const ApprovalRequestList: React.FC = () => {
         <tbody>
           {filteredRequests.map(request => (
             <tr key={request.id}>
-              <td>{request.requestNumber}</td>
-              <td>{request.employeeName}</td>
-              <td>{request.startDate}</td>
-              <td>{request.endDate}</td>
-              <td>{request.type}</td>
+              <td>{request.id}</td>
+              <td>{request.leaveRequest.employee.fullName}</td>
+              <td>{formatDate(request.leaveRequest.startDate)}</td>
+              <td>{formatDate(request.leaveRequest.endDate)}</td>
+              <td>{request.leaveRequest.absenceReason}</td>
               <td>{request.status}</td>
               <td>
                 <button onClick={() => handleViewDetails(request.id)}>View Details</button>
@@ -142,11 +177,11 @@ const ApprovalRequestDetails: React.FC<{ request: ApprovalRequest; onClose: () =
   return (
     <div>
       <h2>Approval Request Details</h2>
-      <p>Request Number: {request.requestNumber}</p>
-      <p>Employee Name: {request.employeeName}</p>
-      <p>Start Date: {request.startDate}</p>
-      <p>End Date: {request.endDate}</p>
-      <p>Type: {request.type}</p>
+      <p>Request Number: {request.id}</p>
+      <p>Employee Name: {request.leaveRequest.employee.fullName}</p>
+      <p>Start Date: {formatDate(request.leaveRequest.startDate)}</p>
+      <p>End Date: {formatDate(request.leaveRequest.endDate)}</p>
+      <p>Reason: {request.leaveRequest.absenceReason}</p>
       <p>Status: {request.status}</p>
       <button onClick={onClose}>Close</button>
     </div>

@@ -4,12 +4,24 @@ import { useRole } from '../contexts/RoleContext';
 
 interface LeaveRequest {
   id: number;
-  requestNumber: string;
-  employeeName: string;
   startDate: string;
   endDate: string;
   type: string;
   status: string;
+  employee: {
+    id: number;
+    fullName: string;
+    subdivision: string;
+    position: string;
+    status: string;
+    peoplePartner: string;
+    outOfOfficeBalance: number;
+    photo: string | null;
+    role: {
+      id: number;
+      name: string;
+    };
+  };
 }
 
 const LeaveRequestList: React.FC = () => {
@@ -60,8 +72,7 @@ const LeaveRequestList: React.FC = () => {
   }, [requests, sortConfig]);
 
   const filteredRequests = sortedRequests.filter(request =>
-    request.id.toString().toLowerCase().includes(searchTerm.toLowerCase())
-    // request.requestNumber.toLowerCase().includes(searchTerm.toLowerCase())
+    request.id.toString().includes(searchTerm.toLowerCase())
   );
 
   const handleViewDetails = (id: number) => {
@@ -121,6 +132,11 @@ const LeaveRequestList: React.FC = () => {
     }
   };
 
+  const formatDate = (date: string) => {
+    const options: Intl.DateTimeFormatOptions = { day: '2-digit', month: '2-digit', year: 'numeric' };
+    return new Date(date).toLocaleDateString(undefined, options);
+  };
+
   return (
     <div>
       <h2>Leave Requests</h2>
@@ -136,8 +152,8 @@ const LeaveRequestList: React.FC = () => {
       <table>
         <thead>
           <tr>
-            <th onClick={() => handleSort('requestNumber')}>Request Number</th>
-            <th onClick={() => handleSort('employeeName')}>Employee Name</th>
+            <th onClick={() => handleSort('id')}>Request ID</th>
+            <th onClick={() => handleSort('employee.fullName' as keyof LeaveRequest)}>Employee Name</th>
             <th onClick={() => handleSort('startDate')}>Start Date</th>
             <th onClick={() => handleSort('endDate')}>End Date</th>
             <th onClick={() => handleSort('type')}>Type</th>
@@ -148,10 +164,10 @@ const LeaveRequestList: React.FC = () => {
         <tbody>
           {filteredRequests.map(request => (
             <tr key={request.id}>
-              <td>{request.requestNumber}</td>
-              <td>{request.employeeName}</td>
-              <td>{request.startDate}</td>
-              <td>{request.endDate}</td>
+              <td>{request.id}</td>
+              <td>{request.employee.fullName}</td>
+              <td>{formatDate(request.startDate)}</td>
+              <td>{formatDate(request.endDate)}</td>
               <td>{request.type}</td>
               <td>{request.status}</td>
               <td>
@@ -166,11 +182,52 @@ const LeaveRequestList: React.FC = () => {
       </table>
 
       {showDetails && selectedRequest && (
-        <LeaveRequestDetails
-          request={selectedRequest}
-          onClose={handleFormClose}
-          onUpdate={handleUpdateRequest}
-        />
+        <div>
+          <h3>Leave Request Details</h3>
+          <form onSubmit={handleUpdateRequest}>
+            <p>Request Number: {selectedRequest.id}</p>
+            <p>Employee Name: {selectedRequest.employee.fullName}</p>
+            <label>
+              Start Date:
+              <input
+                type="date"
+                name="startDate"
+                value={selectedRequest.startDate}
+                onChange={(e) =>
+                  setSelectedRequest({ ...selectedRequest, startDate: e.target.value })
+                }
+              />
+            </label>
+            <label>
+              End Date:
+              <input
+                type="date"
+                name="endDate"
+                value={selectedRequest.endDate}
+                onChange={(e) =>
+                  setSelectedRequest({ ...selectedRequest, endDate: e.target.value })
+                }
+              />
+            </label>
+            <label>
+              Type:
+              <select
+                name="type"
+                value={selectedRequest.type}
+                onChange={(e) =>
+                  setSelectedRequest({ ...selectedRequest, type: e.target.value })
+                }
+              >
+                <option value="Sick Leave">Sick Leave</option>
+                <option value="Vacation">Vacation</option>
+                <option value="Personal">Personal</option>
+              </select>
+            </label>
+            <p>Status: {selectedRequest.status}</p>
+            <button type="submit">Update</button>
+            <button type="button" onClick={handleFormClose}>Close</button>
+          </form>
+        </div>
       )}
 
       {showCreateForm && (
@@ -210,61 +267,6 @@ const LeaveRequestList: React.FC = () => {
           </form>
         </div>
       )}
-    </div>
-  );
-};
-
-const LeaveRequestDetails: React.FC<{ request: LeaveRequest; onClose: () => void; onUpdate: (e: React.FormEvent) => void }> = ({ request, onClose, onUpdate }) => {
-  const [editableRequest, setEditableRequest] = useState<LeaveRequest>(request);
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setEditableRequest(prevState => ({
-      ...prevState,
-      [name]: value
-    }));
-  };
-
-  return (
-    <div>
-      <h2>Leave Request Details</h2>
-      <form onSubmit={onUpdate}>
-        <p>Request Number: {editableRequest.requestNumber}</p>
-        <p>Employee Name: {editableRequest.employeeName}</p>
-        <label>
-          Start Date:
-          <input
-            type="date"
-            name="startDate"
-            value={editableRequest.startDate}
-            onChange={handleChange}
-          />
-        </label>
-        <label>
-          End Date:
-          <input
-            type="date"
-            name="endDate"
-            value={editableRequest.endDate}
-            onChange={handleChange}
-          />
-        </label>
-        <label>
-          Type:
-          <select
-            name="type"
-            value={editableRequest.type}
-            onChange={handleChange}
-          >
-            <option value="Sick Leave">Sick Leave</option>
-            <option value="Vacation">Vacation</option>
-            <option value="Personal">Personal</option>
-          </select>
-        </label>
-        <p>Status: {editableRequest.status}</p>
-        <button type="submit">Update</button>
-        <button type="button" onClick={onClose}>Close</button>
-      </form>
     </div>
   );
 };

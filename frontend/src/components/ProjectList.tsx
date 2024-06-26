@@ -5,8 +5,25 @@ import { useRole } from '../contexts/RoleContext';
 
 interface Project {
   id: number;
-  name: string;
   status: string;
+  projectType: string;
+  startDate: string;
+  endDate: string;
+  comment: string | null;
+  projectManager: {
+    id: number;
+    fullName: string;
+    subdivision: string;
+    position: string;
+    status: string;
+    peoplePartner: string;
+    outOfOfficeBalance: number;
+    photo: string | null;
+    role: {
+      id: number;
+      name: string;
+    };
+  };
 }
 
 const ProjectList: React.FC = () => {
@@ -15,6 +32,7 @@ const ProjectList: React.FC = () => {
   const [sortColumn, setSortColumn] = useState<keyof Project | ''>('');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+  const [isEditMode, setIsEditMode] = useState<boolean>(false);
   const { role } = useRole();
 
   useEffect(() => {
@@ -38,9 +56,22 @@ const ProjectList: React.FC = () => {
     setSortDirection(direction);
 
     const sortedProjects = [...projects].sort((a, b) => {
-      if (a[column] < b[column]) return direction === 'asc' ? -1 : 1;
-      if (a[column] > b[column]) return direction === 'asc' ? 1 : -1;
-      return 0;
+      const aValue = a[column];
+      const bValue = b[column];
+
+      if (aValue === null || bValue === null) return 0;
+
+      if (column === 'startDate' || column === 'endDate') {
+        const dateA = new Date(aValue as string);
+        const dateB = new Date(bValue as string);
+        if (dateA < dateB) return direction === 'asc' ? -1 : 1;
+        if (dateA > dateB) return direction === 'asc' ? 1 : -1;
+        return 0;
+      } else {
+        if (aValue < bValue) return direction === 'asc' ? -1 : 1;
+        if (aValue > bValue) return direction === 'asc' ? 1 : -1;
+        return 0;
+      }
     });
 
     setProjects(sortedProjects);
@@ -52,12 +83,26 @@ const ProjectList: React.FC = () => {
 
   const handleOpenProject = (project: Project) => {
     setSelectedProject(project);
+    setIsEditMode(false);
   };
 
   const handleAddProject = async () => {
-    const newProject = { id: 0, name: 'New Project', status: 'active' };
+    const newProject = { id: 0, status: 'active', projectType: '', startDate: '', endDate: '', comment: null, projectManager: {
+        id: 0,
+        fullName: '',
+        subdivision: '',
+        position: '',
+        status: '',
+        peoplePartner: '',
+        outOfOfficeBalance: 0,
+        photo: null,
+        role: {
+          id: 0,
+          name: '',
+        },
+      }};
     try {
-      await axios.post('/projects', newProject);
+      await axios.post('http://localhost:5000/projects', newProject);
       fetchProjects();
     } catch (error) {
       console.error('Failed to add project:', error);
@@ -66,7 +111,7 @@ const ProjectList: React.FC = () => {
 
   const handleUpdateProject = async (project: Project) => {
     try {
-      await axios.put(`/projects/${project.id}`, project);
+      await axios.put(`http://localhost:5000/projects/${project.id}`, project);
       fetchProjects();
     } catch (error) {
       console.error('Failed to update project:', error);
@@ -75,7 +120,7 @@ const ProjectList: React.FC = () => {
 
   const handleDeactivateProject = async (projectId: number) => {
     try {
-      await axios.put(`/projects/${projectId}/deactivate`);
+      await axios.put(`http://localhost:5000/projects/${projectId}/deactivate`);
       fetchProjects();
     } catch (error) {
       console.error('Failed to deactivate project:', error);
@@ -83,9 +128,14 @@ const ProjectList: React.FC = () => {
   };
 
   const filteredProjects = projects.filter(project => {
-    return project.name?.toLowerCase().includes(filter.toLowerCase()) ||
+    return project.projectType.toLowerCase().includes(filter.toLowerCase()) ||
            project.id.toString().includes(filter);
   });
+
+  const formatDate = (date: string) => {
+    const options: Intl.DateTimeFormatOptions = { day: '2-digit', month: '2-digit', year: 'numeric' };
+    return new Date(date).toLocaleDateString(undefined, options);
+  };
 
   return (
     <div>
@@ -100,8 +150,11 @@ const ProjectList: React.FC = () => {
         <thead>
           <tr>
             <th onClick={() => handleSort('id')}>ID</th>
-            <th onClick={() => handleSort('name')}>Name</th>
             <th onClick={() => handleSort('status')}>Status</th>
+            <th onClick={() => handleSort('projectType')}>Type</th>
+            <th onClick={() => handleSort('startDate')}>Start Date</th>
+            <th onClick={() => handleSort('endDate')}>End Date</th>
+            <th>Project Manager</th>
             {role !== 'Employee' && <th>Actions</th>}
           </tr>
         </thead>
@@ -109,14 +162,17 @@ const ProjectList: React.FC = () => {
           {filteredProjects.map((project) => (
             <tr key={project.id}>
               <td>{project.id}</td>
-              <td>{project.name}</td>
               <td>{project.status}</td>
+              <td>{project.projectType}</td>
+              <td>{formatDate(project.startDate)}</td>
+              <td>{formatDate(project.endDate)}</td>
+              <td>{project.projectManager.fullName}</td>
               {role !== 'Employee' && (
                 <td>
                   <button onClick={() => handleOpenProject(project)}>Open</button>
                   {role !== 'HR Manager' && (
                     <>
-                      <button onClick={() => handleUpdateProject(project)}>Update</button>
+                      <button onClick={() => { handleOpenProject(project); setIsEditMode(true); }}>Update</button>
                       <button onClick={() => handleDeactivateProject(project.id)}>Deactivate</button>
                     </>
                   )}
@@ -134,6 +190,8 @@ const ProjectList: React.FC = () => {
         <ProjectDetails
           project={selectedProject}
           onClose={() => setSelectedProject(null)}
+          onSave={handleUpdateProject}
+          isEditMode={isEditMode}
         />
       )}
     </div>
