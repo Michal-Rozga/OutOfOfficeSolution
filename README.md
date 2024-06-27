@@ -89,5 +89,7 @@ michaelbrown - Administrator
 You can use password: password123
 for testing purposes.
 
+Since there is no logout functionality, please remember to refresh the page after logging in.
 
+The logout functionality could be easily implemented, to properly handle the logout and the roles.
 
