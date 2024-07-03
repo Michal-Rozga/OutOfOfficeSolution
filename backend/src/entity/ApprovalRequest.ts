@@ -1,4 +1,4 @@
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Employee } from './Employee';
 import { LeaveRequest } from './LeaveRequest';
 
@@ -11,7 +11,7 @@ export class ApprovalRequest {
     @JoinColumn({ name: 'approverId' })
     approver!: Employee;
 
-    @ManyToOne(() => LeaveRequest, { eager: true })
+    @OneToOne(() => LeaveRequest, { eager: true })
     @JoinColumn({ name: 'leaveRequestId' })
     leaveRequest!: LeaveRequest;
 
