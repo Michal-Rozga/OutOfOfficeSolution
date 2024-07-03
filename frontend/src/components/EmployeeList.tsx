@@ -8,6 +8,8 @@ interface Employee {
   fullName: string;
   subdivision: string;
   position: string;
+  peoplePartner: string;
+  outOfOfficeBalance: number;
   status: string;
   role: {
     id: number;
@@ -227,6 +229,14 @@ const EditEmployeeForm: React.FC<{ employee: Employee; onClose: () => void }> = 
         <input type="text" name="position" value={formData.position} onChange={handleChange} />
       </label>
       <label>
+        People Partner:
+        <input type="text" name="peoplePartner" value={formData.peoplePartner} onChange={handleChange} />
+      </label>
+      <label>
+        Out of Office Balance:
+        <input type="text" name="outOfOfficeBalance" value={formData.outOfOfficeBalance} onChange={handleChange} />
+      </label>
+      <label>
         Status:
         <select name="status" value={formData.status} onChange={handleChange}>
           <option value="active">Active</option>
@@ -267,6 +277,8 @@ const AddEmployeeForm: React.FC<{ onClose: () => void }> = ({ onClose }) => {
     fullName: '',
     subdivision: '',
     position: '',
+    peoplePartner: '',
+    outOfOfficeBalance: 0,
     status: 'active',
     role: { id: 0, name: '' },
   });
@@ -300,6 +312,14 @@ const AddEmployeeForm: React.FC<{ onClose: () => void }> = ({ onClose }) => {
       <label>
         Position:
         <input type="text" name="position" value={formData.position} onChange={handleChange} />
+      </label>
+      <label>
+        People Partner:
+        <input type="text" name="peoplePartner" value={formData.peoplePartner} onChange={handleChange} />
+      </label>
+      <label>
+        Out of Office Balance:
+        <input type="text" name="outOfOfficeBalance" value={formData.outOfOfficeBalance} onChange={handleChange} />
       </label>
       <label>
         Status:

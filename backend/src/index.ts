@@ -37,6 +37,16 @@ createConnection().then(async connection => {
     }
   });
 
+  app.post('/employees', async (req, res) => {
+    try {
+      const employee = await connection.getRepository(Employee).save(req.body);
+      res.status(201).json(employee);
+    } catch (error) {
+      console.error('Failed to create employee:', error);
+      res.status(500).send('Failed to create employee');
+    }
+  });
+
   app.post('/register', async (req, res) => {
     const { username, password, role } = req.body;
 
