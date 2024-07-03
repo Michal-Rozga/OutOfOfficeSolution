@@ -138,50 +138,54 @@ const ProjectList: React.FC = () => {
   };
 
   return (
-    <div className={styles.projectListContainer}>
-      <h1>Project List</h1>
-      <input
-        type="text"
-        placeholder="Search by project name or ID"
-        value={filter}
-        onChange={handleSearch}
-      />
-      <table>
-        <thead>
-          <tr>
-            <th onClick={() => handleSort('id')}>ID</th>
-            <th onClick={() => handleSort('status')}>Status</th>
-            <th onClick={() => handleSort('projectType')}>Type</th>
-            <th onClick={() => handleSort('startDate')}>Start Date</th>
-            <th onClick={() => handleSort('endDate')}>End Date</th>
-            <th>Project Manager</th>
-            {role !== 'Employee' && <th>Actions</th>}
-          </tr>
-        </thead>
-        <tbody>
-          {filteredProjects.map((project) => (
-            <tr key={project.id}>
-              <td>{project.id}</td>
-              <td>{project.status}</td>
-              <td>{project.projectType}</td>
-              <td>{formatDate(project.startDate)}</td>
-              <td>{formatDate(project.endDate)}</td>
-              <td>{project.projectManager.fullName}</td>
-              {role !== 'Employee' && (
-                <td>
-                  <button onClick={() => handleOpenProject(project)}>Open</button>
-                  {role !== 'HR Manager' && (
-                    <>
-                      <button onClick={() => { handleOpenProject(project); setIsEditMode(true); }}>Update</button>
-                      <button onClick={() => handleDeactivateProject(project.id)}>Deactivate</button>
-                    </>
-                  )}
-                </td>
-              )}
+    <div className={styles.container}>
+      <h1 className={styles.heading}>Project List</h1>
+      <div className={styles.inputContainer}>
+        <input
+          type="text"
+          placeholder="Search by project name or ID"
+          value={filter}
+          onChange={handleSearch}
+        />
+      </div>
+      <div className={styles.tableContainer}>
+        <table>
+          <thead>
+            <tr>
+              <th onClick={() => handleSort('id')}>ID</th>
+              <th onClick={() => handleSort('status')}>Status</th>
+              <th onClick={() => handleSort('projectType')}>Type</th>
+              <th onClick={() => handleSort('startDate')}>Start Date</th>
+              <th onClick={() => handleSort('endDate')}>End Date</th>
+              <th>Project Manager</th>
+              {role !== 'Employee' && <th>Actions</th>}
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {filteredProjects.map((project) => (
+              <tr key={project.id}>
+                <td>{project.id}</td>
+                <td>{project.status}</td>
+                <td>{project.projectType}</td>
+                <td>{formatDate(project.startDate)}</td>
+                <td>{formatDate(project.endDate)}</td>
+                <td>{project.projectManager.fullName}</td>
+                {role !== 'Employee' && (
+                  <td className={styles.actions}>
+                    <button onClick={() => handleOpenProject(project)}>Open</button>
+                    {role !== 'HR Manager' && (
+                      <>
+                        <button onClick={() => { handleOpenProject(project); setIsEditMode(true); }}>Update</button>
+                        <button onClick={() => handleDeactivateProject(project.id)}>Deactivate</button>
+                      </>
+                    )}
+                  </td>
+                )}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
       {role !== 'Employee' && (
         <button className={styles.addProjectButton} onClick={handleAddProject}>Add Project</button>
       )}

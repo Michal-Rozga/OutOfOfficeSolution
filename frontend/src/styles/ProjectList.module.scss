@@ -1,93 +1,120 @@
-$primary-color: #007bff;
-$background-color: #f8f9fa;
-$border-color: #ced4da;
-$table-header-bg: #e9ecef;
-$input-padding: 8px;
-$button-padding: 10px 15px;
-$border-radius: 4px;
-
-.projectListContainer {
+.container {
   padding: 20px;
-  background-color: $background-color;
-  border: 1px solid $border-color;
-  border-radius: $border-radius;
-  max-width: 800px;
-  margin: auto;
+}
 
-  h1 {
-    margin-bottom: 20px;
-    color: $primary-color;
-  }
+.heading {
+  font-size: 24px;
+  margin-bottom: 10px;
+}
 
-  input[type="text"] {
-    width: 100%;
-    padding: $input-padding;
-    border: 1px solid $border-color;
-    border-radius: $border-radius;
-    margin-bottom: 20px;
-    font-size: 1em;
-  }
+.inputContainer {
+  margin-bottom: 20px;
+}
 
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-bottom: 20px;
+.tableContainer {
+  overflow-x: auto;
+}
 
-    th {
-      background-color: $table-header-bg;
-      color: #333;
-      cursor: pointer;
-      padding: $input-padding;
-      border: 1px solid $border-color;
-      text-align: left;
-    }
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
 
-    td {
-      padding: $input-padding;
-      border: 1px solid $border-color;
-    }
+th,
+td {
+  padding: 10px;
+  border: 1px solid #ddd;
+  text-align: left;
+}
 
-    tbody tr:nth-child(even) {
-      background-color: #f2f2f2;
-    }
+th {
+  background-color: #f2f2f2;
+  cursor: pointer;
+}
 
-    tbody tr:hover {
-      background-color: #ddd;
-    }
+tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
 
-    button {
-      padding: $button-padding;
-      border: none;
-      border-radius: $border-radius;
-      background-color: $primary-color;
-      color: #fff;
-      cursor: pointer;
-      margin-right: 10px;
+tr:hover {
+  background-color: #ddd;
+}
 
-      &:hover {
-        background-color: darken($primary-color, 10%);
-      }
-
-      &:last-of-type {
-        background-color: #dc3545;
-
-        &:hover {
-          background-color: darken(#dc3545, 10%);
-        }
-      }
-    }
-  }
+.actions {
+  display: flex;
+  gap: 10px;
 }
 
 .addProjectButton {
-  padding: $button-padding;
+  padding: 8px 12px;
+  background-color: #007bff;
+  color: white;
   border: none;
-  border-radius: $border-radius;
-  background-color: $primary-color;
-  color: #fff;
   cursor: pointer;
+  margin-top: 20px;
+}
 
-  &:hover {
-    background-color: darken($primary-color, 10%);
-  }
+.addProjectButton:hover {
+  background-color: #0056b3;
+}
+.container {
+  padding: 20px;
+}
+
+.heading {
+  font-size: 24px;
+  margin-bottom: 10px;
+}
+
+.inputContainer {
+  margin-bottom: 20px;
+}
+
+.tableContainer {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+th,
+td {
+  padding: 10px;
+  border: 1px solid #ddd;
+  text-align: left;
+}
+
+th {
+  background-color: #f2f2f2;
+  cursor: pointer;
+}
+
+tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+tr:hover {
+  background-color: #ddd;
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+}
+
+.addProjectButton {
+  padding: 8px 12px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  cursor: pointer;
+  margin-top: 20px;
+}
+
+.addProjectButton:hover {
+  background-color: #0056b3;
 }
