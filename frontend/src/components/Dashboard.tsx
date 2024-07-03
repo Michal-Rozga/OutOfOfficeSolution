@@ -18,9 +18,7 @@ const Dashboard: React.FC = () => {
         <div className={styles.section}><EmployeeList /></div>
       ) : null}
       <div className={styles.section}><ProjectList /></div>
-      {role === 'Administrator' || role === 'HR Manager' || role === 'Project Manager' ? (
-        <div className={styles.section}><LeaveRequestList /></div>
-      ) : null}
+      <div className={styles.section}><LeaveRequestList /></div>
       {role === 'Administrator' || role === 'HR Manager' || role === 'Project Manager' ? (
         <div className={styles.section}><ApprovalRequestList /></div>
       ) : null}
